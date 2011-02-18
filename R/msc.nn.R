@@ -96,9 +96,9 @@ msc.nn <- function (y, x, knn = ncol(x), pLevelP = 0.2, pLevel,
 }
 
 #Extract a subset of the persistence hierarchy of ms
-msc.sublevels <- function(ms, startLevel = ms$predictLevel, endLevel = ms$startLevel){
-  ms$levels <- ms$levels[startLevel:endLevel]
-  ms$predictLevel <- ms$predictLevel - startLevel+1
+msc.sublevels <- function(ms, startLevel = ms$predictLevel, endLevel = startLevel){
+  ms$level <- ms$level[startLevel:endLevel]
+  ms$predictLevel <- endLevel-startLevel+1
   ms$nLevels <- endLevel - startLevel + 1
   ms
 }

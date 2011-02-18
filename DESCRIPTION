@@ -1,6 +1,6 @@
 Package: msr
-Version: 0.0
-Date: 2011-01-29
+Version: 0.1
+Date: 2011-02-18
 Author: Samuel Gerber <sgerber@cs.utah.edu>, Kristi Potter
         <kpotter@sci.utah.edu>, Oliver Ruebel <ruebel1@llnl.gov>
 Maintainer: Samuel Gerber <sgerber@cs.utah.edu>
@@ -15,5 +15,5 @@ Depends: R (>= 1.9.0), stats, class, glmnet, stats4, e1071, rgl,
         RColorBrewer, colorspace
 License: GPL-2
 Repository: CRAN
-Packaged: 2011-02-18 07:22:58 UTC; hornik
-Date/Publication: 2011-02-18 07:29:38
+Packaged: 2011-02-18 17:18:40 UTC; sgerber
+Date/Publication: 2011-02-18 18:10:28

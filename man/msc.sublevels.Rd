@@ -10,7 +10,7 @@ a single or smaller range sof persistence level of the Morse-Samle hierarchy.
 
 \usage{
 
-msc.sublevels(ms, startLevel = ms$predictLevel, endLevel = ms$startLevel)
+msc.sublevels(ms, startLevel = ms$predictLevel, endLevel = startLevel)
 }
 
 \arguments{
