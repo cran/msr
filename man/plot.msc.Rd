@@ -24,9 +24,11 @@
   \eqn{\mathbf{x}}{x} can be selected using \code{mscPlot$plotList}.
 }
 \usage{
-\method{plot}{msc}(x, drawStdDev=FALSE, span=0.5, nsamples=50, plot=TRUE, ...)
-\method{plot}{msc.kd}(x, drawStdDev=FALSE, span=0.5, nsamples=50,  plot=TRUE, ...)
-\method{plot}{msc.svm}(x, drawStdDev=FALSE, span=0.5, nsamples=50,  plot=TRUE, ...)
+\method{plot}{msc}(x, drawStdDev=FALSE, span=0.5, nsamples=50,
+plot=TRUE, colorMap=0, ...)
+\method{plot}{msc.kd}(x, drawStdDev=FALSE, span=0.5, nsamples=50,  plot=TRUE, colorMap=0, ...)
+\method{plot}{msc.svm}(x, drawStdDev=FALSE, span=0.5, nsamples=50,
+plot=TRUE,  colorMap=0, ...)
 \method{plot}{mscPlot}(x, drawStdDev=FALSE, axesOn=TRUE, ...)
 }
 \arguments{
@@ -37,9 +39,12 @@
   \item{axesOn}{Draw the alignment axes (default TRUE).}
   \item{nsamples}{ NUmber of samples for piecewise linear approximation to regression curve in each
     partition}
-  \item{span}{Span argument of \code{\link{loess}} for computng regression
+  \item{span}{Span argument of \code{\link{loess}} for computIng regression
     curves}
-  \item{plot}{Show visualization (TRUE) or just return the plotting object (FALSE)}
+  \item{plot}{Show visualization (TRUE) or just return the plotting
+    object (FALSE)}
+  \item{colorMap}{The choice of colormap.  0 = Blue-Green-Red, 1 =
+    Blue-White-Red, 2 = Purple-White-Green}
   \item{...}{additional args have no effect}
 }
 \value{

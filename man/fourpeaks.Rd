@@ -24,9 +24,9 @@ On \eqn{[0,1]^2}{[0,1]^2} the function has 4 maxima and 9 minima
 data(fourpeaks)
 %create 1000 samples
 d <- fourpeaks()
-%create 200 samples
+%create 2000 samples
 d <- fourpeaks(2000)
 %rotate domain by 90 degrees
-d <- fourpeaks(2000, pi/4)
+d <- fourpeaks(N=2000, phi=pi/4)
 }
 \keyword{datasets}

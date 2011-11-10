@@ -1,3 +1,10 @@
+//Morse-Smale complex computation as described in:
+// Gerber S, Bremer PT, Pascucci V, Whitaker R (2010). 
+// “Visual Exploration of High Dimensional Scalar Functions.” 
+// IEEE Transactions on Visualization and Computer Graphics, 16(6), 1271–1280.
+
+//author: Samuel Gerber
+
 #ifndef NNMSCOMPLEX_H
 #define NNMSCOMPLEX_H
 

@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
+#include <limits>
 
 #include "Matrix.h"
 #include "DenseMatrix.h"
@@ -55,6 +57,14 @@ namespace blas{
   double ddot_(int *m, double *x, int *incx, double *y, int *incy);
 
   float sdot_(int *m, float *x, int *incx, float *y, int *incy);
+
+
+  //---- QR decomposition ----//
+  void dgeqrf_(int *m, int *n, double *a, int *lda, double *tau, double *work, int *lwork, int *info);
+  void sgeqrf_(int *m, int *n, float *a, int *lda, float *tau, float *work, int *lwork, int *info);
+
+  void dorgqr_(int *m, int *n, int *k, double *a, int *lda, double *tau, double *work, int *lwork, int *info);
+  void sorgqr_(int *m, int *n, int *k, float *a, int *lda, float *tau, float *work, int *lwork, int *info);
 
   //---- LU decvomposition ----//
   void dgetrf_(int * m, int *n, double *a, int *lda, int *ipiv, int *info);
@@ -416,6 +426,69 @@ class Linalg{
     }
     return lu;
   };
+
+
+
+  //---- QRfactorization ---//
+  static DenseMatrix<TPrecision> QR(DenseMatrix<TPrecision> &a){
+    DenseMatrix<TPrecision> q = Copy(a);
+    Linalg<TPrecision>::QR_inplace(q);
+    return q;    
+  };
+
+  static void QR_inplace(DenseMatrix<TPrecision> &q){
+    int n = q.N();
+    int m = q.M();
+    int lda = m;
+    int info = 0;
+    TPrecision *work = new TPrecision[1];
+    int lwork = -1;
+    TPrecision *tau = new TPrecision[n];
+
+    //workspace query
+    if(isDoubleTPrecision()){
+       blas::dgeqrf_(&m, &n, (double*) q.data(), &lda, (double*) tau, (double*) work, &lwork, &info);
+    }
+    else{ 
+       blas::sgeqrf_(&m, &n, (float*) q.data(), &lda, (float*) tau, (float*) work, &lwork, &info);
+    }
+    if(info !=0 ){
+      std::cerr << "QRF workspace error: " << info << std::endl;
+    }
+
+    lwork = work[0];
+    delete work;
+    work = new TPrecision[lwork];
+
+    //qr
+    if(isDoubleTPrecision()){
+      blas::dgeqrf_(&m, &n, (double*) q.data(), &lda, (double*) tau, (double*) work, &lwork, &info);
+      if(info !=0 ){
+        std::cerr << "QRF error: " << info << std::endl;
+      }
+
+      blas::dorgqr_(&m, &n, &n, (double*) q.data(), &lda, (double*) tau, (double*) work, &lwork, &info);
+      if(info !=0 ){
+        std::cerr << "QR error: " << info << std::endl;
+      }
+    }
+    else{
+      blas::sgeqrf_(&m, &n, (float*) q.data(), &lda, (float*) tau, (float*) work, &lwork, &info);
+      if(info !=0 ){
+        std::cerr << "QRF error: " << info << std::endl;
+      }
+
+      blas::sorgqr_(&m, &n, &n, (float*) q.data(), &lda, (float*) tau, (float*) work, &lwork, &info);
+      if(info !=0 ){
+        std::cerr << "QR error: " << info << std::endl;
+      }
+    }
+
+
+    delete work;
+    delete tau;
+  };
+
 
 
   //---- Choelsky factorization ---//
@@ -1280,7 +1353,7 @@ class Linalg{
 
   static DenseVector<TPrecision> ColumnwiseNorm(Matrix<TPrecision> &A){
     DenseVector<TPrecision> norms(A.N());
-    ColumnwiseNOrm(A, norms);
+    ColumnwiseNorm(A, norms);
     return norms;
   };
 	  
@@ -1524,9 +1597,14 @@ class Linalg{
     }
   };   
   
-  //result = v*s
+  //returns 0 vector for vectors with 1/length = inf
   static void Normalize(Vector<TPrecision> &v){
-      Scale(v, 1.f/(Length(v)+1e-16), v);
+      TPrecision l = 1.0/Length(v);
+      if( l!=l || 
+          std::numeric_limits<TPrecision>::infinity() == l ){
+        l = 0;
+      }
+      Scale(v, l, v);
   }; 
   
 
@@ -1636,6 +1714,7 @@ class Linalg{
   };
 
 
+
   static bool IsColumnEqual(DenseMatrix<TPrecision> A, int ai, DenseMatrix<TPrecision>
       B, int bi){
     bool equal = true;
@@ -1644,6 +1723,7 @@ class Linalg{
     }
     return equal;
   };
+
 
 
   static DenseVector<TPrecision> Max(Matrix<TPrecision> &A){
@@ -1657,6 +1737,9 @@ class Linalg{
     }
     return m;
   };
+
+
+
 
   static DenseVector<TPrecision> Min(Matrix<TPrecision> &A){
     DenseVector<TPrecision> m = Linalg<TPrecision>::ExtractColumn(A, 0);

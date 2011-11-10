@@ -1,21 +1,21 @@
 ##-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-##
 ## Compute and visualize the high dimensional function
 ##-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-##
-plot.msc.svm <- function(x, drawStdDev=FALSE, span=0.5, nsamples=50, plot=TRUE,...) {
+plot.msc.svm <- function(x, drawStdDev=FALSE, span=0.5, nsamples=50, plot=TRUE, colorMap=0,...) {
   plot.msc(x, drawStdDev, span, nsamples)
 }
 
-plot.msc.kd <- function(x, drawStdDev=FALSE, span=0.5, nsamples=50, plot=TRUE,...) {
+plot.msc.kd <- function(x, drawStdDev=FALSE, span=0.5, nsamples=50, plot=TRUE, colorMap=0,...) {
   plot.msc(x, drawStdDev, span, nsamples)
 }
 
-plot.msc <- function(x, drawStdDev=FALSE, span=0.5, nsamples=50, plot=TRUE,...) {
+plot.msc <- function(x, drawStdDev=FALSE, span=0.5, nsamples=50, plot=TRUE, colorMap=0,...) {
 
   ## Compute the geometry
   geom <- geometry.mscPlot(x, span=span, nsamples=nsamples)
   
   ## Compute the vis scene
-  scene <- scene.mscPlot(geom)
+  scene <- scene.mscPlot(geom, colorMap=colorMap)
   
   ## Create the mscPlot object
   obj <- structure(list(geom=geom, scene=scene),class="mscPlot")
@@ -64,9 +64,9 @@ plot.mscPlot <- function(x, drawStdDev=FALSE, axesOn=TRUE, ...) {
 
   ## Create the orientation axes
   if(axesOn) {
-    text3d(1, 0, 0, text="x1")
-    text3d(0, 1, 0, text="x2")
-    text3d(0, 0, 1, text="f(x)")
+    text3d(1, 0, 0, texts="x1")
+    text3d(0, 1, 0, texts="x2")
+    text3d(0, 0, 1, texts="f(x)")
     lines3d(c(1, 0, 0),c(0, 0, 1), c(0,0, 0), color="black")
     segments3d(c(0, 0),c(0, 0), c(0, 1), color="red")
   }
@@ -162,7 +162,7 @@ mouseSelect <- function(button, obj) {
         }
         
         function(x,y=NULL,z=NULL) {
-          pixel <- rgl.user2window(x,y,z,proj=proj)
+          pixel <- rgl.user2window(x,y,z,projection=proj)
           x <- pixel[,1]
           y <- pixel[,2]
           z <- pixel[,3]
@@ -248,7 +248,7 @@ mouseSelect <- function(button, obj) {
 ##-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-##
 ## Generate the vis pieces
 ##-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-##
-scene.mscPlot <- function(geom, cSides=8) {
+scene.mscPlot <- function(geom, cSides=8, colorMap=0) {
     ## Create a list of selected colors
     selectColors <- c()  
     brewerSets=c("Set1", "Dark2", "Set3")
@@ -258,8 +258,13 @@ scene.mscPlot <- function(geom, cSides=8) {
     }
     selectColors <- c(selectColors, "#000000")
     
-    ## The blue to red colormap
-    colormap = colorRamp( c('#0066CC', '#CCCC00', '#D22905') , interpolate="linear", bias=0.5)
+    ## The blue, green, red colormap
+    if(colorMap == 0)
+      colormap = colorRamp( c('#0066CC', '#CCCC00', '#D22905') , interpolate="linear", bias=0.5)
+    else if(colorMap == 1)
+      colormap = colorRamp(c('#0520B0', '#f7f7f7', '#CA0020'), interpolate="linear", bias=0.5)
+    else if(colorMap == 2)
+      colormap = colorRamp(c('#7b3294', '#f7f7f7', '#008837'), interpolate="linear", bias=0.5)
     
     ## Create the cylinders
     cylinders <- c()

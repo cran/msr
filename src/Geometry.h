@@ -59,7 +59,7 @@ class Geometry{
     static void computeKNN(Matrix<TPrecision> &data, Matrix<int> &knn,
         Matrix<TPrecision> &dists, Metric<TPrecision> &metric){
         
-        TPrecision distances[data.N()];
+        TPrecision *distances = new TPrecision[data.N()];
 
         for(unsigned int i = 0; i < data.N(); i++){
 
@@ -73,14 +73,14 @@ class Geometry{
             dists(j, i) = minHeap.extractRoot();
           }
         }
-
+        delete[] distances;
     };
 
 
     static void computeKNN(Matrix<TPrecision> &data, int index,
         Vector<int> &knn, Vector<TPrecision> &dists, Metric<TPrecision> &metric){
         
-        TPrecision distances[data.N()];
+        TPrecision *distances = new TPrecision[data.N()];
         for(unsigned int i=0; i<data.N(); i++){
           distances[i] = metric.distance(data, i, data, index); 
         }
@@ -90,6 +90,7 @@ class Geometry{
           knn(i) = minHeap.getRootIndex();
           dists(i) = minHeap.extractRoot();
         }
+	delete[] distances;
     };
    
 
@@ -99,7 +100,7 @@ class Geometry{
         Vector<TPrecision> &point, Vector<int> &knn,
         Vector<TPrecision> &dists, Metric<TPrecision> &metric){
         
-        TPrecision distances[data.N()];
+        TPrecision *distances = new TPrecision[data.N()];
         for(unsigned int i=0; i<data.N(); i++){
           distances[i] = metric.distance(data, i, point); 
         }
@@ -109,6 +110,7 @@ class Geometry{
           knn(i) = minHeap.getRootIndex();
           dists(i) = minHeap.extractRoot();
         }
+	      delete[] distances;
     };
 
 

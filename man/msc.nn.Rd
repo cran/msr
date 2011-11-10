@@ -8,13 +8,16 @@
 \title{Nearest Neighbor Morse Smale Complex}
 \description{
 Compute a hierarchy of Morse-Smale complex of the scattered data x using a
-neareast neighbor based approach at teh request persistence levels. The
+neareast neighbor based approach at the requested persistence levels. The
 persistence is a threshold for merging neighboring extrema. If the difference of
 lower function value of the extrema and the saddle connecting them is below
 \code{persistence} the extrema are merged.  The \code{msc.nn.svm} and
 \code{msc.nn.kd} construct Morse-Smale complex that allow probabilistic
 preditcion (using \code{\link{predict}}) pf the partion assignment of unseen
-data points, see also \code{\link{predict.msc}}.  }
+data points, see also \code{\link{predict.msc}}.  
+The nearest neighbor computation uses the ANN library by David M. Mount and
+Sunil Arya (\url{http://www.cs.umd.edu/~mount/ANN/}).
+}
 
 \usage{
   msc.nn(y, x, knn = ncol(x), pLevelP = 0.2, pLevel, 
@@ -96,7 +99,12 @@ data points, see also \code{\link{predict.msc}}.  }
   Samuel Gerber, Peer-Timo Bremer, Valerio Pascucci, Ross Whitaker,
   Visual Exploration of High Dimensional Scalar Functions,
   IEEE Transactions on Visualization and Computer Graphics, vol. 16,
-  no. 6, pp 1271-1280, Nov.-Dec. 2010. 
+  no. 6, pp 1271-1280, Nov.-Dec. 2010.
+
+  
+  David M. Mount and Sunil Arya
+  ANN library
+  \url{http://www.cs.umd.edu/~mount/ANN/}
 }
 \examples{
 
