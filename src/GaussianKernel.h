@@ -173,7 +173,7 @@ class GaussianKernel : public Kernel<TPrecision, TPrecision>{
   
     void setKernelParam(TPrecision sigma){
       var = 2.0*sigma*sigma;
-      c = 1.0/ pow(2.0*M_PI*sigma*sigma, d/2.0) ;
+      c = 1.0;//1.0/ pow(2.0*M_PI*sigma*sigma, d/2.0) ;
       ng = -2.0/var*c;
       nh = -ng/(sigma*sigma);
     };

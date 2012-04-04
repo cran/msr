@@ -46,7 +46,8 @@ class DenseVector : public Vector<TPrecision>{
 
     void deallocate(){
       if(a != NULL){
-        delete[] a;  
+        delete[] a; 
+        a = NULL; 
       }
     };
 

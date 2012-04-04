@@ -1031,13 +1031,13 @@ class Linalg{
 
       TPrecision *w = y.data();
       int winc = 1;
-      if(y.isRowMajor()){
-        w = &v[yindex];
-        winc = y.N();
-      }
-      else{
+     // if(y.isRowMajor()){
+      //  w = &v[yindex];
+      //  winc = y.N();
+      //}
+      //else{
         w = &w[yindex*y.M()];
-      }
+      //}
 
      int n = x.M();
     
@@ -1087,7 +1087,7 @@ class Linalg{
 
 
   static void ExtractColumn(Matrix<TPrecision> &a, int index, Vector<TPrecision> &v){
-    for(unsigned int i=0; i<a.M(); i++){
+    for(unsigned int i=0; i<std::min(a.M(),v.N()); i++){
       v(i) = a(i, index);
     }
   };
@@ -1182,14 +1182,23 @@ class Linalg{
   };
 
   
-  static void SumColumn(Matrix<TPrecision> &a, int index){
+  static double SumColumn(Matrix<TPrecision> &a, int index){
     double sum = 0;
     for(unsigned int i=0; i < a.M(); i++){
       sum += a(i, index);
     }
+    return sum;
   };
   
-  
+ 
+  static double Sum(Vector<TPrecision> &a){
+    double sum = 0;
+    for(unsigned int i=0; i < a.N(); i++){
+      sum += a(i);
+    }
+    return sum;
+  };
+   
 
 
   static DenseVector<TPrecision> SumRows(Matrix<TPrecision> &a){
@@ -1334,6 +1343,13 @@ class Linalg{
     }    
   };
 
+  static void AddScale(Matrix<TPrecision> &a, int i1, TPrecision s, Vector<TPrecision> &b,
+      Vector<TPrecision> &result){
+    for(unsigned int i = 0; i < a.M(); i++){
+      result(i) = a(i,i1) + s * b(i);
+    }    
+  };
+
   
   static void AddScale(Matrix<TPrecision> &a, TPrecision s, Matrix<TPrecision> &b, Matrix<TPrecision> &result){
     for(unsigned int i = 0; i < a.M(); i++){
@@ -1360,6 +1376,11 @@ class Linalg{
     }    
   };
 
+  static void ColumnAddScale(DenseMatrix<TPrecision> &m, int i1, TPrecision s, DenseMatrix<TPrecision> &b, int i2){
+    for(unsigned int i = 0; i < m.M(); i++){
+      m(i, i1) = m(i, i1) + s * b(i, i2);
+    }    
+  };
 
 
   static DenseVector<TPrecision> ColumnwiseSquaredNorm(Matrix<TPrecision> &A){
@@ -1645,12 +1666,22 @@ class Linalg{
         l = 0;
       }
       Scale(v, l, v);
+  };
+
+
+  static void NormalizeColumn(Matrix<TPrecision> &V, int index){
+      TPrecision l = 1.0/LengthColumn(V, index);
+      if( l!=l || 
+          std::numeric_limits<TPrecision>::infinity() == l ){
+        l = 0;
+      }
+      ScaleColumn(V, index, l);
   }; 
   
 
 
 
-  static void ScaleColumn(DenseMatrix<TPrecision> &m, int index, TPrecision s){
+  static void ScaleColumn(Matrix<TPrecision> &m, int index, TPrecision s){
     for(unsigned int i=0; i < m.M(); i++){
       m(i,index) = m(i, index) * s;
     }
@@ -1749,12 +1780,16 @@ class Linalg{
 
   static DenseMatrix<TPrecision> Transpose(DenseMatrix<TPrecision> A){
     DenseMatrix<TPrecision> B(A.N(), A.M());
+    Transpose(A, B); 
+    return B;
+  };
+
+  static void Transpose(DenseMatrix<TPrecision> A, DenseMatrix<TPrecision> B){
     for(unsigned int i=0; i<A.M(); i++){
       for(unsigned int j=0; j<A.N(); j++){
         B(j, i) = A(i, j);
       }
     }
-    return B;
   };
 
 
@@ -1817,6 +1852,29 @@ class Linalg{
     }
     return m;
   };
+
+
+  static TPrecision MaxColumn(Matrix<TPrecision> &A, int index){
+    TPrecision m = A(0, index);
+    for(unsigned int i=1;i<A.M(); i++){
+        if(A(i, index) > m){
+          m = A(i, index);
+        }
+    }
+    return m;
+  };
+  
+  static TPrecision MinColumn(Matrix<TPrecision> &A, int index){
+    TPrecision m = A(0, index);
+    for(unsigned int i=1;i<A.M(); i++){
+        if(A(i, index) < m){
+          m = A(i, index);
+        }
+    }
+    return m;
+  };
+
+
 
 
   static void Print(DenseMatrix<TPrecision> &m){

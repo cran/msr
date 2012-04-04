@@ -22,7 +22,6 @@
 
 
 
-
 template<typename TPrecision>
 class NNMSComplex{
 
@@ -257,7 +256,6 @@ class NNMSComplex{
     };
 
 
-
     void getPersistence(DenseVector<TPrecision> pers){
       int index = 0;
       for(map_f_pi_it it = persistence.begin(); it != persistence.end(); ++it, ++index){
@@ -318,14 +316,17 @@ private:
           double d = sqrt(KNND(k, i));
           double g = ys(j) - ys(i);
           if(d == 0 ){
-            d = 0.00000001;
+            /*if(g > 0){
+              g = std::numeric_limits<double>::max(); 
+            }
+            else{
+              g = std::numeric_limits<double>::min(); 
+            }*/
+            g = 0;
           }
-          //if(g == 0){
-          //std::cout << "mooooooo" << std::endl;
-          //std::cout << i << ":" << j << std::endl;
-          //std::cout << ys(i) << ":" << ys(j) << std::endl;
-          //}
-          g = g / d;
+          else{
+            g = g / d; 
+          }
           
           if(G(0, i) < g){
             G(0, i) = g;
@@ -474,6 +475,7 @@ private:
                   p.second = e2;
                 }
                 pers = y(extremaIndex(p.first)) -  std::min(y(i), y(KNN(k, i)));
+                //pers = l2.distance(X, extremaIndex(e1), X, extremaIndex(e2) ); 
               }
               else{
                 if(y(extremaIndex(e1)) < y(extremaIndex(e2)) ){
@@ -485,6 +487,7 @@ private:
                   p.second = e2;
                 }
                 pers = std::max(y(i), y(KNN(k, i))) - y(extremaIndex(p.first));
+                //pers = l2.distance(X, extremaIndex(e1), X, extremaIndex(e2) ); 
               }
 
               map_pi_f_it it = pinv.find(p);

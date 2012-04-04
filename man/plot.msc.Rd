@@ -63,10 +63,17 @@ plot=TRUE,  colorMap=0, ...)
   \code{\link{msc.nn.kd}}
 }
 \references{
-  Samuel Gerber, Peer-Timo Bremer, Valerio Pascucci, Ross Whitaker,
+  [1] Samuel Gerber and Kristin Potter
+  The Morse-Smale Complex for Data Analysis,
+  Journal of Statistical Software, 2012, vol. 50, no. 2, pp 1-22 
+  
+  [2] Samuel Gerber, Oliver Ruebel Peer-Timo Bremer, Valerio Pascucci, Ross Whitaker,
+  Morse-Smale Regression, Journal of Computational and Graphical Statistics, 2012
+
+  [3] Samuel Gerber, Peer-Timo Bremer, Valerio Pascucci, Ross Whitaker,
   Visual Exploration of High Dimensional Scalar Functions,
   IEEE Transactions on Visualization and Computer Graphics, vol. 16,
-  no. 6, pp 1271-1280, Nov.-Dec. 2010.   
+  no. 6, pp 1271-1280, Nov.-Dec. 2010.
 }
 \examples{
 

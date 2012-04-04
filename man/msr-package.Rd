@@ -39,10 +39,11 @@ visualization in [3] (see \code{plot.msc}) is implemented.
 }
 \references{
   [1] Samuel Gerber and Kristin Potter
-  The Morse-Smale Complex for Data Analysis (submitted)
+  The Morse-Smale Complex for Data Analysis,
+  Journal of Statistical Software, 2012, vol. 50, no. 2, pp 1-22 
   
   [2] Samuel Gerber, Oliver Ruebel Peer-Timo Bremer, Valerio Pascucci, Ross Whitaker,
-  Morse-Smale Regression (submitted)
+  Morse-Smale Regression, Journal of Computational and Graphical Statistics, 2012
 
   [3] Samuel Gerber, Peer-Timo Bremer, Valerio Pascucci, Ross Whitaker,
   Visual Exploration of High Dimensional Scalar Functions,

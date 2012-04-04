@@ -2,6 +2,7 @@
 #define DENSEMATRIX_H
 
 #include "Matrix.h"
+#include <stdlib.h>
 
 //Simple Matrix storage to column major to use with lapack
 template <typename TPrecision>
@@ -55,7 +56,8 @@ class DenseMatrix : public Matrix<TPrecision>{
     void deallocate(){
       if(a != NULL){
         delete[] a;
-        delete[] fastAccess; 
+        delete[] fastAccess;
+        a = NULL; 
       } 
     };
 

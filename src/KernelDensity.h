@@ -40,6 +40,18 @@ class KernelDensity{
       return wsum;
     };
 
+
+    DenseVector<TPrecision> p(DenseMatrix<TPrecision> e){
+      DenseVector<TPrecision> res(e.N());
+      DenseVector<TPrecision> tmp(e.M());
+      for(int i=0; i< e.N(); i++){
+        Linalg<TPrecision>::ExtractColumn(e, i, tmp);
+        res(i) = p(tmp);
+      }
+      return res;
+    };
+
+
     double p(DenseVector<TPrecision> &x, int leaveout = -1){
       TPrecision wsum = 0;
       for(unsigned int i=0; i < X.N(); i++){

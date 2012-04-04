@@ -23,6 +23,7 @@ class Kernel{
     
     virtual void setKernelParam(TKernelParam param) = 0;
 
+    virtual TKernelParam getKernelParam() = 0;
 
 };
 
