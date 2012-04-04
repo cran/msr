@@ -342,8 +342,8 @@ class NNMSComplexR2{
           curR2 += it->second;
         }
         curR2 /= r2.size();
-        std::cout << "#Crystals: " << crystals.size() << std::endl;
-        std::cout << "R2: " << curR2 << std::endl;
+        //std::cout << "#Crystals: " << crystals.size() << std::endl;
+        //std::cout << "R2: " << curR2 << std::endl;
 
         //find best possible merge in terms of R2
         double improve = 0;

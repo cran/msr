@@ -377,7 +377,7 @@ class NNMSComplexR2{
         if(s.size() < 2){
           int e2 = *s.begin();
           if(connections[e2].size() < 2){
-            std::cout << "Disconnected barf" << std::endl;
+            //std::cout << "Disconnected barf" << std::endl;
           }
         }
       }
@@ -420,9 +420,9 @@ class NNMSComplexR2{
         persistence(persistence.N() - connections.size() + 1) = curR2;
         
  
-        std::cout << "#Crystals: " << crystals.size() << std::endl;
-        std::cout << "#Extrema: " << connections.size() << std::endl;
-        std::cout << "R2: " << curR2 << std::endl;
+        //std::cout << "#Crystals: " << crystals.size() << std::endl;
+        //std::cout << "#Extrema: " << connections.size() << std::endl;
+        //std::cout << "R2: " << curR2 << std::endl;
 
         //find best possible merge in terms of R2
         double best = -std::numeric_limits<double>::infinity();
@@ -469,7 +469,7 @@ class NNMSComplexR2{
           }
           else{
             for(int n = next; n < nLevels; n++){
-              std::cout << n <<std::endl;
+              //std::cout << n <<std::endl;
               crystalHistory[n] = crystals; 
             }
           }

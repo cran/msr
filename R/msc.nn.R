@@ -1,4 +1,4 @@
-#type 1 indiacte to use persistence for merging, type 2 (not 1 actually) uses
+#type 1 indiacte to use persistence for merging, type 2 uses
 #R^2 based merging criterion
 msc.nn <- function (y, x, knn = ncol(x), pLevelP = 0.2, pLevel, 
                     nLevels, type = 1, smooth = FALSE, eps=0.01) 
@@ -95,6 +95,9 @@ msc.nn <- function (y, x, knn = ncol(x), pLevelP = 0.2, pLevel,
     obj
 }
 
+
+
+
 #Extract a subset of the persistence hierarchy of ms
 msc.sublevels <- function(ms, startLevel = ms$predictLevel, endLevel = startLevel){
   ms$level <- ms$level[startLevel:endLevel]
@@ -102,4 +105,7 @@ msc.sublevels <- function(ms, startLevel = ms$predictLevel, endLevel = startLeve
   ms$nLevels <- endLevel - startLevel + 1
   ms
 }
+
+
+
 

@@ -6,6 +6,7 @@ export(
   "msc.nn", 
   "msc.nn.kd", 
   "msc.nn.svm", 
+  "msc.graph", 
   "msc.lm", 
   "msc.elnet", 
   "msc.slm",

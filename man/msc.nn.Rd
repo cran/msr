@@ -5,6 +5,7 @@
 \alias{msc.nn}
 \alias{msc.nn.kd}
 \alias{msc.nn.svm}
+\alias{msc.graph}
 \title{Nearest Neighbor Morse Smale Complex}
 \description{
 Compute a hierarchy of Morse-Smale complex of the scattered data x using a
@@ -26,12 +27,15 @@ Sunil Arya (\url{http://www.cs.umd.edu/~mount/ANN/}).
             bw, type = 1, smooth = FALSE, eps=0.01) 
   msc.nn.svm(y, x, knn = 3*ncol(x), pLevelP = 0.2, pLevel, nLevels, 
              cost = 1,  type = 1, smooth=FALSE, precompute = FALSE, eps=0.01 ) 
+  msc.graph(y, x, knn, knnd, nLevels, smooth = FALSE) 
 }
 
 \arguments{
   \item{y}{Function values at observations x. A numeric vector is expected.}
   \item{x}{Observations, a numeric marix is expected.}
-  \item{knn}{Number of nearest neighbors for graph computation.}    
+  \item{knn}{Number of nearest neighbors for graph computation or matrix with nn
+            indicies}    
+  \item{knnd}{Squared nearest nieghbor distances has to be same size as knn}    
   \item{pLevel}{ Compute the Morse-Smale complex for a single persistence level
      given by pLevel. Here, extrema with persistence less than \code{pLevel} are
      ignored.}

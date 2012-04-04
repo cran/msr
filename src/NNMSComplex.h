@@ -40,12 +40,17 @@ class NNMSComplex{
     typedef typename map_f_pi::iterator map_f_pi_it;
 
 
-    //Steepest ascending KNNG(0,) and descending KNNG(1, ) neighbros for each point    
+    //Steepest ascending KNNG(0,) and descending KNNG(1, ) neighbors for each point    
     DenseMatrix<int> KNNG;
 
     //Data points
     DenseMatrix<TPrecision> X;
     DenseVector<TPrecision> y;
+      
+    DenseMatrix<int> KNN;
+    DenseMatrix<TPrecision> KNND;
+    
+
     //extrema ID for ach point --- max extrema(0, ) and min extrema(1, ) 
     DenseMatrix<int> extrema;
 
@@ -111,16 +116,178 @@ class NNMSComplex{
 
   public:
 
+
+    NNMSComplex(DenseMatrix<TPrecision> &Xin, DenseVector<TPrecision> &yin,
+                DenseMatrix<int> &KNNin, DenseMatrix<TPrecision> &KNNDin, 
+                bool smooth = false) : X(Xin), y(yin), KNN(KNNin), KNND(KNNDin){
+      runMS(smooth);
+
+    };
+
+ 
     NNMSComplex(DenseMatrix<TPrecision> &Xin, DenseVector<TPrecision> &yin, int
         knn, bool smooth = false, double eps=0.01) : X(Xin), y(yin){
       if(knn > (int) X.N()){
         knn = X.N();
       }
-      DenseMatrix<int> KNN(knn, X.N());
-      DenseMatrix<TPrecision> KNND(knn, X.N());
+      KNN = DenseMatrix<int>(knn, X.N());
+      KNND = DenseMatrix<TPrecision>(knn, X.N());
 
       //Compute nearest nieghbors
       Geometry<TPrecision>::computeANN(X, KNN, KNND, eps);
+      runMS(smooth);      
+      KNN.deallocate();
+      KNND.deallocate();
+    };
+
+
+
+
+
+
+
+    //Compute the MS crystals for the given persistence level. Neighboring
+    //extrema with a absolute difference between saddle and lower exterma
+    //smaller than pLevel, are recursively joined into a single extrema.
+    void mergePersistence(TPrecision pLevel){
+      //compute merge chain 
+      for(unsigned int i=0; i<merge.N(); i++){
+        merge(i) = i;
+      } 
+      
+
+  
+      for(map_f_pi_it it = persistence.begin(); it != persistence.end() && (*it).first < pLevel; ++it){
+        std::pair<int, int> p = (*it).second;        
+        p.first = followChain(p.first);
+        p.second = followChain(p.second);
+        if(p.first < nMax){
+          if( y(extremaIndex(p.first)) > y(extremaIndex(p.second)) ){ 
+            std::swap(p.second, p.first); 
+          }
+        }
+        else{
+          if( y(extremaIndex(p.first)) < y(extremaIndex(p.second)) ){ 
+            std::swap(p.second, p.first);
+          }
+        }
+        merge(p.first) = p.second;
+      }
+      for(unsigned int i=0; i<merge.N(); i++){
+        merge(i) = followChain(i);
+      }
+
+
+      //compute crystals based on merge chain
+      mergeCrystals();
+      
+    };
+
+   
+
+
+    //Get partioning accordinng to the crystals of the MS-complex for the
+    //currently set persistence level
+    DenseVector<int> getPartitions(){
+      DenseVector<int> crys(X.N());
+      getPartitions(crys);
+      return crys;
+    };
+
+
+
+
+    void getPartitions(DenseVector<int> &crys){
+      for(unsigned int i=0; i<X.N(); i++){
+        std::pair<int, int> p( merge(extrema(0, i)), merge(extrema(1, i)) );
+        crys(i) = pcrystals[p];
+      }
+    };
+
+
+    int getNCrystals(){
+      return pcrystals.size();
+    };
+
+
+    int getNAllExtrema(){
+      return extremaIndex.N();
+    }; 
+
+    //return extrema indicies (first row is max, secon is min) for each crystal
+    DenseMatrix<int> getCrystals(){
+       DenseMatrix<int> e(2, pcrystals.size());
+       getCrystals(e);
+       return e;
+    };
+
+
+    void getCrystals(DenseMatrix<int> ce){
+     for(map_pi_i_it it = pcrystals.begin(); it != pcrystals.end(); ++it){
+        std::pair<int, int> p = (*it).first;
+        ce(0, (*it).second) = extremaIndex(p.first);
+        ce(1, (*it).second) = extremaIndex(p.second);
+      }
+    };
+
+
+
+    void getMax(DenseVector<int> vmaxs){
+     for(map_pi_i_it it = pcrystals.begin(); it != pcrystals.end(); ++it){
+        std::pair<int, int> p = (*it).first;
+        vmaxs((*it).second) = extremaIndex(p.first);
+      }
+    };
+
+
+
+    void getMin(DenseVector<int> vmins){
+     for(map_pi_i_it it = pcrystals.begin(); it != pcrystals.end(); ++it){
+        std::pair<int, int> p = (*it).first;
+        vmins((*it).second) = extremaIndex(p.second);
+      }
+    };
+
+
+    //get persistencies
+    DenseVector<TPrecision> getPersistence(){
+      DenseVector<TPrecision> pers(persistence.size()+1);
+      getPersistence(pers);
+      return pers;
+    };
+
+
+
+    void getPersistence(DenseVector<TPrecision> pers){
+      int index = 0;
+      for(map_f_pi_it it = persistence.begin(); it != persistence.end(); ++it, ++index){
+        pers(index) = (*it).first;
+      }
+      pers(index) = std::numeric_limits<TPrecision>::max();
+    };
+
+
+
+    void cleanup(){
+      extrema.deallocate();
+      merge.deallocate();
+      extremaIndex.deallocate();
+      KNNG.deallocate();
+
+    };
+
+
+
+
+
+private:
+
+
+
+    void runMS(bool smooth){
+
+
+      int knn = KNN.M();
 
       DenseVector<TPrecision> ys;
       if(smooth){
@@ -137,16 +304,29 @@ class NNMSComplex{
         ys = y;
       }
 
+
       KNNG = DenseMatrix<int>(2, X.N());
       Linalg<int>::Set(KNNG, -1);
       DenseMatrix<TPrecision> G = DenseMatrix<TPrecision>(2, X.N());
       Linalg<TPrecision>::Zero(G);
 
+
       //compute steepest asc/descending neighbors
       for(unsigned int i=0; i<X.N(); i++){
         for(unsigned int k=1; k<KNN.M(); k++){
           int j = KNN(k, i);
-          double g = (ys(j) - ys(i)) / sqrt(KNND(k, i));
+          double d = sqrt(KNND(k, i));
+          double g = ys(j) - ys(i);
+          if(d == 0 ){
+            d = 0.00000001;
+          }
+          //if(g == 0){
+          //std::cout << "mooooooo" << std::endl;
+          //std::cout << i << ":" << j << std::endl;
+          //std::cout << ys(i) << ":" << ys(j) << std::endl;
+          //}
+          g = g / d;
+          
           if(G(0, i) < g){
             G(0, i) = g;
             KNNG(0, i) = j;
@@ -165,10 +345,10 @@ class NNMSComplex{
           }
         }
       }
-      KNND.deallocate();
       if(smooth){
        ys.deallocate();
       }
+
 
 
       //compute for each point its minimum and maximum based on
@@ -397,140 +577,6 @@ class NNMSComplex{
       //initialize to 0 persistence
       mergePersistence(0);
   
-      KNN.deallocate();
-    };
-
-
-
-
-
-    //Compute the MS crystals for the given persistence level. Neighboring
-    //extrema with a absolute difference between saddle and lower exterma
-    //smaller than pLevel, are recursively joined into a single extrema.
-    void mergePersistence(TPrecision pLevel){
-      //compute merge chain 
-      for(unsigned int i=0; i<merge.N(); i++){
-        merge(i) = i;
-      } 
-      
-
-  
-      for(map_f_pi_it it = persistence.begin(); it != persistence.end() && (*it).first < pLevel; ++it){
-        std::pair<int, int> p = (*it).second;        
-        p.first = followChain(p.first);
-        p.second = followChain(p.second);
-        if(p.first < nMax){
-          if( y(extremaIndex(p.first)) > y(extremaIndex(p.second)) ){ 
-            std::swap(p.second, p.first); 
-          }
-        }
-        else{
-          if( y(extremaIndex(p.first)) < y(extremaIndex(p.second)) ){ 
-            std::swap(p.second, p.first);
-          }
-        }
-        merge(p.first) = p.second;
-      }
-      for(unsigned int i=0; i<merge.N(); i++){
-        merge(i) = followChain(i);
-      }
-
-
-      //compute crystals based on merge chain
-      mergeCrystals();
-      
-    };
-
-   
-
-
-    //Get partioning accordinng to the crystals of the MS-complex for the
-    //currently set persistence level
-    DenseVector<int> getPartitions(){
-      DenseVector<int> crys(X.N());
-      getPartitions(crys);
-      return crys;
-    };
-
-
-
-
-    void getPartitions(DenseVector<int> &crys){
-      for(unsigned int i=0; i<X.N(); i++){
-        std::pair<int, int> p( merge(extrema(0, i)), merge(extrema(1, i)) );
-        crys(i) = pcrystals[p];
-      }
-    };
-
-
-    int getNCrystals(){
-      return pcrystals.size();
-    };
-
-
-    int getNAllExtrema(){
-      return extremaIndex.N();
-    }; 
-
-    //return extrema indicies (first row is max, secon is min) for each crystal
-    DenseMatrix<int> getCrystals(){
-       DenseMatrix<int> e(2, pcrystals.size());
-       getCrystals(e);
-       return e;
-    };
-
-
-    void getCrystals(DenseMatrix<int> ce){
-     for(map_pi_i_it it = pcrystals.begin(); it != pcrystals.end(); ++it){
-        std::pair<int, int> p = (*it).first;
-        ce(0, (*it).second) = extremaIndex(p.first);
-        ce(1, (*it).second) = extremaIndex(p.second);
-      }
-    };
-
-
-
-    void getMax(DenseVector<int> vmaxs){
-     for(map_pi_i_it it = pcrystals.begin(); it != pcrystals.end(); ++it){
-        std::pair<int, int> p = (*it).first;
-        vmaxs((*it).second) = extremaIndex(p.first);
-      }
-    };
-
-
-
-    void getMin(DenseVector<int> vmins){
-     for(map_pi_i_it it = pcrystals.begin(); it != pcrystals.end(); ++it){
-        std::pair<int, int> p = (*it).first;
-        vmins((*it).second) = extremaIndex(p.second);
-      }
-    };
-
-
-    //get persistencies
-    DenseVector<TPrecision> getPersistence(){
-      DenseVector<TPrecision> pers(persistence.size()+1);
-      getPersistence(pers);
-      return pers;
-    };
-
-
-
-    void getPersistence(DenseVector<TPrecision> pers){
-      int index = 0;
-      for(map_f_pi_it it = persistence.begin(); it != persistence.end(); ++it, ++index){
-        pers(index) = (*it).first;
-      }
-      pers(index) = std::numeric_limits<TPrecision>::max();
-    };
-
-
-
-    void cleanup(){
-      extrema.deallocate();
-      merge.deallocate();
-      extremaIndex.deallocate();
-      KNNG.deallocate();
     };
 
 

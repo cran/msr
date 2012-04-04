@@ -28,7 +28,6 @@ namespace blas{
   extern "C"{
 
   //---- matrix matrix multiply ----//
-  
   void dgemm_(char *transa, char *transb, int *m, int *n, int *k,
       double *alpha, double *A, int *lda, double *B, int *ldb, double *beta,
       double *C, int *ldc);
@@ -41,7 +40,6 @@ namespace blas{
 
 
   //---- matrix vector multiply ----//
-  
   void dgemv_(char *trans, int *m, int *n, double *alpha, double *A, int *lda, 
       double *x, int *incx, double *beta, double *y, int *incy);
     
@@ -53,7 +51,6 @@ namespace blas{
 
 
   //---- dot product ----/
-  
   double ddot_(int *m, double *x, int *incx, double *y, int *incy);
 
   float sdot_(int *m, float *x, int *incx, float *y, int *incy);
@@ -85,13 +82,11 @@ namespace blas{
 
 
   //---- inverse symmetric positive definite matrix ----/
-  
   void dpotri_(char *uplo, int *n, double *A, int *lda, int *info);
   
   void spotri_(char *uplo, int *n, float *A, int *lda, int *info);
 
   //---- Solve SPD linear equations ----//
-
   void dposv_(char *uplo, int *n, int *nrhs, double *A, int *lda, double *B,
       int *ldb, int *info );
 
@@ -109,7 +104,6 @@ namespace blas{
       int *iwork, int *info );
 
   //---- Solve linear equations ----/
-  
   void dgesv_( int *n, int *nrhs, double *A, int *lda, int *ipiv, double *b, int
       *ldb, int *info );
 
@@ -1099,6 +1093,13 @@ class Linalg{
   };
   
 
+  static DenseVector<TPrecision> ExtractRow(Matrix<TPrecision> &a, int index){
+    DenseVector<TPrecision> v(a.N());
+    for(unsigned int i=0; i<a.N(); i++){
+      v(i) = a(index, i);
+    }
+    return v;
+  };
 
 
   static void ExtractRow(Matrix<TPrecision> &a, int index, Vector<TPrecision> &v){
@@ -1120,7 +1121,21 @@ class Linalg{
     for(unsigned int i=0; i<a.N(); i++){
       a(index, i) = v(i);
     }
+  };
+
+  
+  static void SetColumn(Matrix<TPrecision> &a, int index, TPrecision v){
+    for(unsigned int i=0; i<a.M(); i++){
+      a(i, index) = v;
+    }
+  };
+
+  static void SetRow(Matrix<TPrecision> &a, int index, TPrecision v){
+    for(unsigned int i=0; i<a.N(); i++){
+      a(index, i) = v;
+    }
   }; 
+
 
 
   static void SetColumn(Matrix<TPrecision> &a, int aindex,
@@ -1165,6 +1180,15 @@ class Linalg{
         }
       }
   };
+
+  
+  static void SumColumn(Matrix<TPrecision> &a, int index){
+    double sum = 0;
+    for(unsigned int i=0; i < a.M(); i++){
+      sum += a(i, index);
+    }
+  };
+  
   
 
 
@@ -1211,13 +1235,19 @@ class Linalg{
 
 
   static void SubtractColumn(Matrix<TPrecision> &a, int index, Vector<TPrecision> &v,
-      Matrix<TPrecision> &out){
+      Matrix<TPrecision> &out)  {
       for(unsigned int i=0; i < a.M(); i++){
         out(i, index) = a(i, index) - v(i);
       }
   };
 
 
+  static void AddColumn(Matrix<TPrecision> &a, int index, Vector<TPrecision> &v,
+      Matrix<TPrecision> &out){
+      for(unsigned int i=0; i < a.M(); i++){
+        out(i, index) = a(i, index) + v(i);
+      }
+  };
 
   static void SubtractRowwise(Matrix<TPrecision> &a, Vector<TPrecision> &v,
       Matrix<TPrecision> &out){
@@ -1377,6 +1407,16 @@ class Linalg{
       result(i) = a(i) - b;
     }    
   };
+
+    //result = a - b
+  static void Subtract(Matrix<TPrecision> &a, TPrecision b, Matrix<TPrecision> &result){
+    for(unsigned int i = 0; i < a.M(); i++){
+      for(unsigned int j = 0; j < a.N(); j++){
+        result(i,j) = a(i, j) - b;
+      }
+    }    
+  };
+
   //result = a - b
   static void Add(Vector<TPrecision> &a, TPrecision b, Vector<TPrecision> &result){
     for(unsigned int i = 0; i < a.N(); i++){
@@ -1617,8 +1657,12 @@ class Linalg{
   };
 
   static void ScaleRow(DenseMatrix<TPrecision> &m, int index, TPrecision s){
+    ScaleRow(m, index, s, m);
+  };
+  
+  static void ScaleRow(DenseMatrix<TPrecision> &m, int index, TPrecision s, DenseMatrix<TPrecision> &out){
     for(unsigned int i=0; i < m.N(); i++){
-      m(index, i) = m(index, i) * s;
+      out(index, i) = m(index, i) * s;
     }
   };
 
@@ -1773,6 +1817,25 @@ class Linalg{
     }
     return m;
   };
+
+
+  static void Print(DenseMatrix<TPrecision> &m){
+    for(int i=0; i<m.M(); i++){
+      for(int j=0; j< m.N(); j++){
+        std::cout << m(i, j) << ", ";
+      }
+      std::cout << std::endl;
+    }
+  };
+
+    static void Print(DenseVector<TPrecision> &v){
+      for(int j=0; j< v.N(); j++){
+        std::cout << v(j) << ", ";
+      }
+      std::cout << std::endl;
+  };
+
+
 
 
 };

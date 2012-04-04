@@ -189,9 +189,9 @@ class LinalgIO{
 
     //convert to column major if necessary
     if(rowMajor){
-      DenseMatrix<TPrecision> a( matrix.M(), matrix.N());
-      for(unsigned int i=0; i<matrix.M(); i++){
-        for(unsigned int j=0; j<matrix.N(); j++){
+      DenseMatrix<TPrecision> a( matrix.N(), matrix.M());
+      for(unsigned int i=0; i<a.M(); i++){
+        for(unsigned int j=0; j<a.N(); j++){
           a(i, j) = matrix(j, i);
         }
       }
