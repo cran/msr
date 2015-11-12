@@ -14,10 +14,10 @@ template <typename TPrecision>
 class Geometry{
   
   public:
-    static DenseMatrix<TPrecision> computeDistances(Matrix<TPrecision> &data, 
+    static FortranLinalg::DenseMatrix<TPrecision> computeDistances(FortranLinalg::Matrix<TPrecision> &data, 
                                                     Metric<TPrecision> &metric){
         
-        DenseMatrix<TPrecision> distances(data.N(), data.N());
+        FortranLinalg::DenseMatrix<TPrecision> distances(data.N(), data.N());
   
         computeDistances(data, metric, distances);
 
@@ -26,9 +26,9 @@ class Geometry{
 
 
 
-    static void computeDistances(Matrix<TPrecision> &data, 
+    static void computeDistances(FortranLinalg::Matrix<TPrecision> &data, 
                                  Metric<TPrecision> &metric, 
-                                 Matrix<TPrecision> &distances){
+                                 FortranLinalg::Matrix<TPrecision> &distances){
       
         for(unsigned int i=0; i < data.N(); i++){
           distances(i,i) = 0;
@@ -42,10 +42,10 @@ class Geometry{
 
 
 
-    static void computeDistances(Matrix<TPrecision> &data,
+    static void computeDistances(FortranLinalg::Matrix<TPrecision> &data,
                                  int index,  
                                  Metric<TPrecision> &metric, 
-                                 Vector<TPrecision> &distances){
+                                 FortranLinalg::Vector<TPrecision> &distances){
       
         for(unsigned int i=0; i < data.N(); i++){
           distances(i) = 0;
@@ -56,8 +56,8 @@ class Geometry{
 
 
 
-    static void computeKNN(Matrix<TPrecision> &data, Matrix<int> &knn,
-        Matrix<TPrecision> &dists, Metric<TPrecision> &metric){
+    static void computeKNN(FortranLinalg::Matrix<TPrecision> &data, FortranLinalg::Matrix<int> &knn,
+        FortranLinalg::Matrix<TPrecision> &dists, Metric<TPrecision> &metric){
         
         TPrecision *distances = new TPrecision[data.N()];
 
@@ -77,8 +77,8 @@ class Geometry{
     };
 
 
-    static void computeKNN(Matrix<TPrecision> &data, int index,
-        Vector<int> &knn, Vector<TPrecision> &dists, Metric<TPrecision> &metric){
+    static void computeKNN(FortranLinalg::Matrix<TPrecision> &data, int index,
+        FortranLinalg::Vector<int> &knn, FortranLinalg::Vector<TPrecision> &dists, Metric<TPrecision> &metric){
         
         TPrecision *distances = new TPrecision[data.N()];
         for(unsigned int i=0; i<data.N(); i++){
@@ -96,9 +96,9 @@ class Geometry{
 
 
 
-    static void computeKNN(Matrix<TPrecision> &data,
-        Vector<TPrecision> &point, Vector<int> &knn,
-        Vector<TPrecision> &dists, Metric<TPrecision> &metric){
+    static void computeKNN(FortranLinalg::Matrix<TPrecision> &data,
+        FortranLinalg::Vector<TPrecision> &point, FortranLinalg::Vector<int> &knn,
+        FortranLinalg::Vector<TPrecision> &dists, Metric<TPrecision> &metric){
         
         TPrecision *distances = new TPrecision[data.N()];
         for(unsigned int i=0; i<data.N(); i++){
@@ -116,8 +116,9 @@ class Geometry{
 
 
 
-    static void computeANN(DenseMatrix<double> &data, DenseMatrix<int> &knn,
-        DenseMatrix<double> &dists, double eps){
+    static void computeANN(FortranLinalg::DenseMatrix<double> &data,
+        FortranLinalg::DenseMatrix<int> &knn, FortranLinalg::DenseMatrix<double>
+        &dists, double eps){
 
       ANNpointArray pts= data.getColumnAccessor();
 

@@ -1,5 +1,21 @@
 useDynLib("msr")
 
+importFrom("glmnet", "cv.glmnet")
+importFrom("glmnet", "glmnet")
+importFrom("e1071", "svm")
+importFrom("grDevices", "colorRamp", "dev.list", "dev.new", "dev.set",
+             "rgb")
+importFrom("graphics", "axis", "lines", "par")
+importFrom("stats", "BIC", "dist", "formula", "lm", "loess", "median",
+             "model.matrix", "prcomp", "predict", "rnorm", "runif",
+             "step", "var")
+
+import(
+ "rgl", 
+ "RColorBrewer",
+ "colorspace"
+)
+
 export(
   "msc.sublevels",
   "msc.level.ind",

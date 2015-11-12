@@ -1,6 +1,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+namespace FortranLinalg{
 
 template <typename TPrecision>
 class Vector{
@@ -15,5 +16,6 @@ class Vector{
     virtual void deallocate() = 0;
 };
 
+}
 
 #endif

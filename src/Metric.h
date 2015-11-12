@@ -9,10 +9,12 @@ class Metric{
     
   public:
     virtual ~Metric(){};
-    virtual TPrecision distance(Vector<TPrecision> &x1, Vector<TPrecision> &x2) = 0;
-    virtual TPrecision distance(Matrix<TPrecision> &X, int ix,
-        Matrix<TPrecision> &Y, int iy) = 0;
-    virtual TPrecision distance(Matrix<TPrecision> &X, int i1, Vector<TPrecision> &x2) = 0;
+    virtual TPrecision distance(FortranLinalg::Vector<TPrecision> &x1,
+        FortranLinalg::Vector<TPrecision> &x2) = 0;
+    virtual TPrecision distance(FortranLinalg::Matrix<TPrecision> &X, int ix,
+        FortranLinalg::Matrix<TPrecision> &Y, int iy) = 0;
+    virtual TPrecision distance(FortranLinalg::Matrix<TPrecision> &X, int i1,
+        FortranLinalg::Vector<TPrecision> &x2) = 0;
 };
 
 

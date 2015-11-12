@@ -72,10 +72,12 @@ void annPrintPt(						// print a point
 	int					dim,			// the dimension
 	std::ostream		&out)			// output stream
 {
+  /*
 	for (int j = 0; j < dim; j++) {
 		out << pt[j];
 		if (j < dim-1) out << " ";
 	}
+  */
 }
 
 //----------------------------------------------------------------------

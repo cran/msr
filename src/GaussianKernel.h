@@ -17,7 +17,7 @@ class GaussianKernel : public Kernel<TPrecision, TPrecision>{
     TPrecision nh;
     TPrecision c;
     unsigned int d; 
-    DenseVector<TPrecision> diff;
+    FortranLinalg::DenseVector<TPrecision> diff;
 
   public:
   
@@ -42,31 +42,32 @@ class GaussianKernel : public Kernel<TPrecision, TPrecision>{
     };
     
 
-    TPrecision f(Vector<TPrecision> &x1, Vector<TPrecision> &x2){
+    TPrecision f(FortranLinalg::Vector<TPrecision> &x1, FortranLinalg::Vector<TPrecision> &x2){
       return f( metric.distanceSquared(x1, x2) );
     };
 
 
 
   
-    TPrecision f(Vector<TPrecision> &x1, Matrix<TPrecision> &X2, int i2){
+    TPrecision f(FortranLinalg::Vector<TPrecision> &x1, FortranLinalg::Matrix<TPrecision> &X2, int i2){
       return f( metric.distanceSquared(X2, i2, x1 ) );
     };
   
   
-    TPrecision f(Matrix<TPrecision> &X1, int i1, Matrix<TPrecision> &X2, int i2){
+    TPrecision f(FortranLinalg::Matrix<TPrecision> &X1, int i1, FortranLinalg::Matrix<TPrecision> &X2, int i2){
       return f( metric.distanceSquared(X1, i1, X2, i2 ) );
     };
 
 
-    void grad(Vector<TPrecision> &x1, Vector<TPrecision> &x2, Vector<TPrecision> &g){
+    void grad(FortranLinalg::Vector<TPrecision> &x1, FortranLinalg::Vector<TPrecision> &x2, FortranLinalg::Vector<TPrecision> &g){
       gradf(x1, x2, g); 
     };
 
 
 
     //Hessian
-    DenseMatrix<TPrecision> hessian(Vector<TPrecision> &x1, Vector<TPrecision> &x2){
+    FortranLinalg::DenseMatrix<TPrecision> hessian(FortranLinalg::Vector<TPrecision> &x1, FortranLinalg::Vector<TPrecision> &x2){
+      using namespace FortranLinalg;
       DenseMatrix<TPrecision> H(d, d);
       hessian(x1, x2, H);
       return H;
@@ -74,8 +75,9 @@ class GaussianKernel : public Kernel<TPrecision, TPrecision>{
     };    
     
     //Hessian
-    void hessian(Vector<TPrecision> &x1, Vector<TPrecision>
-        &x2, DenseMatrix<TPrecision> H){
+    void hessian(FortranLinalg::Vector<TPrecision> &x1, FortranLinalg::Vector<TPrecision>
+        &x2, FortranLinalg::DenseMatrix<TPrecision> H){
+      using namespace FortranLinalg;
 
       Linalg<TPrecision>::Subtract(x1, x2, diff);
 
@@ -94,9 +96,10 @@ class GaussianKernel : public Kernel<TPrecision, TPrecision>{
     };
     
     //Hessian
-    void hessian(Matrix<TPrecision> &X1, unsigned int i1,  
-                 Matrix<TPrecision> &X2, unsigned int i2,
-                 DenseMatrix<TPrecision> &H){
+    void hessian(FortranLinalg::Matrix<TPrecision> &X1, unsigned int i1,  
+                 FortranLinalg::Matrix<TPrecision> &X2, unsigned int i2,
+                 FortranLinalg::DenseMatrix<TPrecision> &H){
+      using namespace FortranLinalg;
 
       Linalg<TPrecision>::Subtract(X1, i1, X2, i2, diff);
 
@@ -114,8 +117,9 @@ class GaussianKernel : public Kernel<TPrecision, TPrecision>{
     };
 
     //grad and function value
-    TPrecision gradf(Vector<TPrecision> &x1, Vector<TPrecision> &x2,
-      Vector<TPrecision> &g){
+    TPrecision gradf(FortranLinalg::Vector<TPrecision> &x1, FortranLinalg::Vector<TPrecision> &x2,
+      FortranLinalg::Vector<TPrecision> &g){
+      using namespace FortranLinalg;
   
       Linalg<TPrecision>::Subtract(x1, x2, g);
       TPrecision val = 0;
@@ -131,8 +135,9 @@ class GaussianKernel : public Kernel<TPrecision, TPrecision>{
     };
 
 
-    TPrecision gradf(Matrix<TPrecision> &x1, int i1, Matrix<TPrecision> &x2, int
-        i2, Vector<TPrecision> &g){
+    TPrecision gradf(FortranLinalg::Matrix<TPrecision> &x1, int i1, FortranLinalg::Matrix<TPrecision> &x2, int
+        i2, FortranLinalg::Vector<TPrecision> &g){
+      using namespace FortranLinalg;
   
       Linalg<TPrecision>::Subtract(x1, i1, x2, i2, g);
       TPrecision val = 0;
@@ -147,8 +152,9 @@ class GaussianKernel : public Kernel<TPrecision, TPrecision>{
       return val*c;
     };    
     
-    TPrecision gradf(Vector<TPrecision> &x1, Matrix<TPrecision> &x2, int
-        i2, Vector<TPrecision> &g){
+    TPrecision gradf(FortranLinalg::Vector<TPrecision> &x1, FortranLinalg::Matrix<TPrecision> &x2, int
+        i2, FortranLinalg::Vector<TPrecision> &g){
+      using namespace FortranLinalg;
   
       Linalg<TPrecision>::Subtract(x1, x2, i2, g);
       TPrecision val = 0;
@@ -166,7 +172,7 @@ class GaussianKernel : public Kernel<TPrecision, TPrecision>{
 
 
 
-    TPrecision gradKernelParam(Vector<TPrecision> &x1, Vector<TPrecision> &x2){
+    TPrecision gradKernelParam(FortranLinalg::Vector<TPrecision> &x1, FortranLinalg::Vector<TPrecision> &x2){
       return -2.0/(var*sqrt(var)) * f(x1, x2);         
     };
     
@@ -185,12 +191,13 @@ class GaussianKernel : public Kernel<TPrecision, TPrecision>{
     };
 
     GaussianKernel<TPrecision> &operator=(const GaussianKernel<TPrecision> &rhs){
+      using namespace FortranLinalg;
       if(this == &rhs){
         return *this;
       }
       this->var = rhs.var;
       this->ng = rhs.ng;
-      this->nh = nh;
+      this->nh = rhs.nh;
       this->c = rhs.c;
       this->d = rhs.d;
       diff.deallocate();

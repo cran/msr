@@ -42,13 +42,13 @@ class NNMSComplexR2{
     
 
     //Steepest ascending KNNG(0,) and descending KNNG(1, ) neighbros for each point    
-    DenseMatrix<int> KNNG;
+    FortranLinalg::DenseMatrix<int> KNNG;
 
     //Data points
-    DenseMatrix<TPrecision> X;
-    DenseVector<TPrecision> y;
+    FortranLinalg::DenseMatrix<TPrecision> X;
+    FortranLinalg::DenseVector<TPrecision> y;
     //extrema ID for ach point --- max extrema(0, ) and min extrema(1, ) 
-    DenseMatrix<int> extrema;
+    FortranLinalg::DenseMatrix<int> extrema;
 
     //map of crystals as <max, min> -> set of points in crystal 
     map_pi_si crystals;
@@ -61,11 +61,11 @@ class NNMSComplexR2{
     //connections of maxima (to minima) and minima (to maxima)
     map_i_si connections;
 
-    DenseVector<TPrecision> persistence;
+    FortranLinalg::DenseVector<TPrecision> persistence;
     
     
     //extrema ID to index into X
-    DenseVector<int> extremaIndex;
+    FortranLinalg::DenseVector<int> extremaIndex;
     
     //number of maxima, first nMax entries in extremaIndex are maxima
     int nMax;
@@ -86,6 +86,7 @@ class NNMSComplexR2{
 
 
    double fitLM(set_i &points){
+     using namespace FortranLinalg;
       //TODO decide based on power of R2 statistics
       int n = points.size();
       if(n < X.M()+2 ){
@@ -219,8 +220,9 @@ class NNMSComplexR2{
 
   public:
 
-    NNMSComplexR2(DenseMatrix<TPrecision> &Xin, DenseVector<TPrecision> &yin, int
+    NNMSComplexR2(FortranLinalg::DenseMatrix<TPrecision> &Xin, FortranLinalg::DenseVector<TPrecision> &yin, int
         knn, int nl = -1, bool smooth = false, double eps=0.1) : X(Xin), y(yin){
+     using namespace FortranLinalg;
       nLevels = nl;
       if(knn > X.N()){
         knn = X.N();
@@ -485,7 +487,8 @@ class NNMSComplexR2{
 
     //Get partioning accordinng to the crystals of the MS-complex for the
     //currently set persistence level
-    DenseVector<int> getPartitions(){
+    FortranLinalg::DenseVector<int> getPartitions(){
+     using namespace FortranLinalg;
       DenseVector<int> crys(X.N());
       getPartitions(crys);
       return crys;
@@ -499,7 +502,7 @@ class NNMSComplexR2{
     };
 
 
-    void getPartitions(DenseVector<int> &crys){
+    void getPartitions(FortranLinalg::DenseVector<int> &crys){
       int crystalIndex = 0;
       for(map_pi_si_it it = crystals.begin(); it != crystals.end(); ++it,  ++crystalIndex){
         set_i &points = it->second;
@@ -521,14 +524,15 @@ class NNMSComplexR2{
     }; 
 
     //return extrema indicies (first row is max, secon is min) for each crystal
-    DenseMatrix<int> getExtrema(){
+    FortranLinalg::DenseMatrix<int> getExtrema(){
+     using namespace FortranLinalg;
        DenseMatrix<int> e(2, crystals.size());
        getExtrema(e);
        return e;
     };
 
 
-    void getExtrema(DenseMatrix<int> ce){
+    void getExtrema(FortranLinalg::DenseMatrix<int> ce){
       int crystalIndex = 0;
       for(map_pi_si_it it = crystals.begin(); it != crystals.end(); ++it, ++crystalIndex){
         pair_i p = it->first;
@@ -539,7 +543,7 @@ class NNMSComplexR2{
 
 
 
-    void getMax(DenseVector<int> vmaxs){
+    void getMax(FortranLinalg::DenseVector<int> vmaxs){
       int crystalIndex = 0;
      for(map_pi_si_it it = crystals.begin(); it != crystals.end(); ++it, ++crystalIndex){
         pair_i p = it->first;
@@ -548,7 +552,7 @@ class NNMSComplexR2{
     };
 
 
-    void getMin(DenseVector<int> vmins){
+    void getMin(FortranLinalg::DenseVector<int> vmins){
       int crystalIndex = 0;
       for(map_pi_si_it it = crystals.begin(); it != crystals.end(); ++it, ++crystalIndex){
         pair_i p = it->first;
@@ -557,13 +561,14 @@ class NNMSComplexR2{
     };
     
     //get persistencies
-    DenseVector<TPrecision> getPersistence(){
+    FortranLinalg::DenseVector<TPrecision> getPersistence(){
+     using namespace FortranLinalg;
       DenseVector<TPrecision> pers(persistence.N());
       getPersistence(pers);
       return pers;
     };
 
-    void getPersistence(DenseVector<TPrecision> pers){
+    void getPersistence(FortranLinalg::DenseVector<TPrecision> pers){
       for(int i=0; i<persistence.N(); i++){
         pers(i) = persistence(i);
       }

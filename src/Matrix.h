@@ -1,6 +1,7 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+namespace FortranLinalg{
 
 //Simple Matrix storage to abstract row and columnwise ordering
 template <typename TPrecision>
@@ -13,5 +14,7 @@ class Matrix{
     virtual unsigned int N() = 0;    
     virtual void deallocate() = 0;
 };
+
+}
 
 #endif

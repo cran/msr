@@ -11,9 +11,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Vector.h"
 #include "DenseMatrix.h"
 #include "DenseVector.h"
+
+namespace FortranLinalg{
 
 template <typename TPrecision>
 class LinalgIO{
@@ -239,5 +240,7 @@ class LinalgIO{
 
 
 };
+
+}
 
 #endif

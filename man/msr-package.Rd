@@ -4,11 +4,10 @@
 \title{Data Analysis with the Morse-Smale Complex }
 \docType{package}
 \description{
-Package for discrete Morse-Smale complex approximation based on kNN graph. The
-Morse-Smale complex provides a decomposition of the domain. This package
-provides methods to compute a hierarchical sequence of Morse-Smale complicies
-and tools that exploit this domain decomposition for regression and
-visualization of scalar functions.
+Discrete Morse-Smale complex approximation based on k-NN graph. The Morse-Smale
+complex provides a decomposition of the domain. This package provides methods to
+compute a hierarchical sequence of Morse-Smale complicies and tools that exploit
+this domain decomposition for regression and visualization of scalar functions.
 }
 
 \details{

@@ -20,6 +20,7 @@ extern "C" {
      
 SEXP nnmspartition (SEXP Rm, SEXP Rn, SEXP Ry, SEXP Rx, SEXP Rknn, SEXP RpLevel, SEXP Rsmooth,
     SEXP knnEps) {
+     using namespace FortranLinalg;
   
   int knn = *INTEGER(Rknn);
   int n = *INTEGER(Rn);
@@ -87,6 +88,7 @@ SEXP nnmspartition (SEXP Rm, SEXP Rn, SEXP Ry, SEXP Rx, SEXP Rknn, SEXP RpLevel,
 
 SEXP nnmsc2(SEXP Rm, SEXP Rn, SEXP Ry, SEXP Rx, SEXP Rknn, SEXP nLevels, SEXP Rsmooth, SEXP
     knnEps) {
+     using namespace FortranLinalg;
   
   int knn = *INTEGER(Rknn);
   int n = *INTEGER(Rn);
@@ -178,6 +180,7 @@ SEXP nnmsc2(SEXP Rm, SEXP Rn, SEXP Ry, SEXP Rx, SEXP Rknn, SEXP nLevels, SEXP Rs
 SEXP graphmsc(SEXP Rm, SEXP Rn, SEXP Rk, SEXP Ry, SEXP Rx, SEXP Rknn, SEXP Rknnd, SEXP nLevels, SEXP Rsmooth) {
   
 
+     using namespace FortranLinalg;
 
   
   int k = *INTEGER(Rk);
@@ -269,6 +272,9 @@ SEXP graphmsc(SEXP Rm, SEXP Rn, SEXP Rk, SEXP Ry, SEXP Rx, SEXP Rknn, SEXP Rknnd
 //merging based on R^2 of linear models
 SEXP nnmscR2(SEXP Rm, SEXP Rn, SEXP Ry, SEXP Rx, SEXP Rknn, SEXP Rsmooth, SEXP knnEps) {
   
+     
+  using namespace FortranLinalg;
+  
   int knn = *INTEGER(Rknn);
   int n = *INTEGER(Rn);
   int m = *INTEGER(Rm);
@@ -337,6 +343,8 @@ SEXP nnmscR2(SEXP Rm, SEXP Rn, SEXP Ry, SEXP Rx, SEXP Rknn, SEXP Rsmooth, SEXP k
 
 SEXP nnmsc2R2(SEXP Rm, SEXP Rn, SEXP Ry, SEXP Rx, SEXP Rknn, SEXP nLevels, SEXP Rsmooth, SEXP
     knnEps) {
+  
+     using namespace FortranLinalg;
   
   int knn = *INTEGER(Rknn);
   int n = *INTEGER(Rn);
@@ -417,6 +425,7 @@ SEXP nnmsc2R2(SEXP Rm, SEXP Rn, SEXP Ry, SEXP Rx, SEXP Rknn, SEXP nLevels, SEXP 
 
 
 void gkde(int *m, int *nx, double *x, double *sigma, int *nxeval, double *xeval, double *peval){
+  using namespace FortranLinalg;
   DenseMatrix<double> X(*m, *nx, x);
   DenseMatrix<double> Xe(*m, *nxeval, xeval);
 

@@ -68,6 +68,7 @@ void ANNkd_split::print(				// print splitting node
 		int level,						// depth of node in tree
 		ostream &out)					// output stream
 {
+  /*
 	child[ANN_HI]->print(level+1, out);	// print high child
 	out << "    ";
 	for (int i = 0; i < level; i++)		// print indentation
@@ -77,6 +78,7 @@ void ANNkd_split::print(				// print splitting node
 	out << " hbnd=" << cd_bnds[ANN_HI];
 	out << "\n";
 	child[ANN_LO]->print(level+1, out);	// print low child
+  */
 }
 
 void ANNkd_leaf::print(					// print leaf node
@@ -84,6 +86,7 @@ void ANNkd_leaf::print(					// print leaf node
 		ostream &out)					// output stream
 {
 
+  /*
 	out << "    ";
 	for (int i = 0; i < level; i++)		// print indentation
 		out << "..";
@@ -99,12 +102,14 @@ void ANNkd_leaf::print(					// print leaf node
 		}
 		out << ">\n";
 	}
+  */
 }
 
 void ANNkd_tree::Print(					// print entire tree
 		ANNbool with_pts,				// print points as well?
 		ostream &out)					// output stream
 {
+  /*
 	out << "ANN Version " << ANNversion << "\n";
 	if (with_pts) {						// print point coordinates
 		out << "    Points:\n";
@@ -119,6 +124,8 @@ void ANNkd_tree::Print(					// print entire tree
 	else {
 		root->print(0, out);			// invoke printing at root
 	}
+  */
+
 }
 
 //----------------------------------------------------------------------

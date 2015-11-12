@@ -10,23 +10,23 @@ class EuclideanMetric : public Metric<TPrecision>{
   public:
     virtual ~EuclideanMetric(){};
 
-    TPrecision distance(Vector<TPrecision> &x1, Vector<TPrecision> &x2){
+    TPrecision distance(FortranLinalg::Vector<TPrecision> &x1, FortranLinalg::Vector<TPrecision> &x2){
       TPrecision result = distanceSquared(x1, x2);
       return sqrt(result); 
     };
 
-    TPrecision distance(Matrix<TPrecision> &X, int i1, Matrix<TPrecision> &Y, int i2){
+    TPrecision distance(FortranLinalg::Matrix<TPrecision> &X, int i1, FortranLinalg::Matrix<TPrecision> &Y, int i2){
       TPrecision result = distanceSquared(X, i1, Y, i2);
       return sqrt(result); 
     };
     
-    TPrecision distance(Matrix<TPrecision> &X, int i1, Vector<TPrecision> &x2){
+    TPrecision distance(FortranLinalg::Matrix<TPrecision> &X, int i1, FortranLinalg::Vector<TPrecision> &x2){
       TPrecision result = distanceSquared(X, i1, x2);
       return sqrt(result); 
     };
 
 
-    TPrecision distanceSquared(Vector<TPrecision> &x1, Vector<TPrecision> &x2){
+    TPrecision distanceSquared(FortranLinalg::Vector<TPrecision> &x1, FortranLinalg::Vector<TPrecision> &x2){
       TPrecision result = 0;
       TPrecision tmp =0;
       for(unsigned int i=0; i<x1.N(); i++){
@@ -36,8 +36,8 @@ class EuclideanMetric : public Metric<TPrecision>{
       return result;
     };
 
-    TPrecision distanceSquared(Matrix<TPrecision> &X, int i1, 
-                               Matrix<TPrecision> &Y, int i2){
+    TPrecision distanceSquared(FortranLinalg::Matrix<TPrecision> &X, int i1, 
+                               FortranLinalg::Matrix<TPrecision> &Y, int i2){
       TPrecision result = 0;
       TPrecision tmp =0;
       for(unsigned int i=0; i<X.M(); i++){
@@ -47,8 +47,8 @@ class EuclideanMetric : public Metric<TPrecision>{
       return result;
     };
 
-    TPrecision distanceSquared(Matrix<TPrecision> &X, int i1,
-        Vector<TPrecision> &x2){
+    TPrecision distanceSquared(FortranLinalg::Matrix<TPrecision> &X, int i1,
+        FortranLinalg::Vector<TPrecision> &x2){
       TPrecision result = 0;
       TPrecision tmp =0;
       for(unsigned int i=0; i< X.M(); i++){

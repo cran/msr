@@ -10,6 +10,7 @@
 
 #include "Geometry.h"
 #include "EuclideanMetric.h"
+#include "SquaredEuclideanMetric.h"
 #include "DenseMatrix.h"
 #include "DenseVector.h"
 #include "Linalg.h"
@@ -40,18 +41,18 @@ class NNMSComplex{
 
 
     //Steepest ascending KNNG(0,) and descending KNNG(1, ) neighbors for each point    
-    DenseMatrix<int> KNNG;
+    FortranLinalg::DenseMatrix<int> KNNG;
 
     //Data points
-    DenseMatrix<TPrecision> X;
-    DenseVector<TPrecision> y;
+    FortranLinalg::DenseMatrix<TPrecision> X;
+    FortranLinalg::DenseVector<TPrecision> y;
       
-    DenseMatrix<int> KNN;
-    DenseMatrix<TPrecision> KNND;
+    FortranLinalg::DenseMatrix<int> KNN;
+    FortranLinalg::DenseMatrix<TPrecision> KNND;
     
 
     //extrema ID for ach point --- max extrema(0, ) and min extrema(1, ) 
-    DenseMatrix<int> extrema;
+    FortranLinalg::DenseMatrix<int> extrema;
 
     //map of crystals as <max, min> -> crystal ID    
     map_pi_i crystals;
@@ -63,9 +64,9 @@ class NNMSComplex{
     map_f_pi persistence;
 
     //extrema ID to index into X
-    DenseVector<int> extremaIndex;
+    FortranLinalg::DenseVector<int> extremaIndex;
     //extrema after merging of crystals e.g extrema(i) -> merge(extrema(i))
-    DenseVector<int> merge;
+    FortranLinalg::DenseVector<int> merge;
     //number of maxima, first nMax entries in extremaIndex are maxima
     int nMax;
 
@@ -116,25 +117,28 @@ class NNMSComplex{
   public:
 
 
-    NNMSComplex(DenseMatrix<TPrecision> &Xin, DenseVector<TPrecision> &yin,
-                DenseMatrix<int> &KNNin, DenseMatrix<TPrecision> &KNNDin, 
-                bool smooth = false) : X(Xin), y(yin), KNN(KNNin), KNND(KNNDin){
-      runMS(smooth);
+    NNMSComplex(FortranLinalg::DenseMatrix<TPrecision> &Xin, FortranLinalg::DenseVector<TPrecision> &yin,
+                FortranLinalg::DenseMatrix<int> &KNNin, FortranLinalg::DenseMatrix<TPrecision> &KNNDin, 
+                bool smooth = false, double sigma2=0) : X(Xin), y(yin), KNN(KNNin), KNND(KNNDin){
+      runMS(smooth, sigma2);
 
     };
 
  
-    NNMSComplex(DenseMatrix<TPrecision> &Xin, DenseVector<TPrecision> &yin, int
-        knn, bool smooth = false, double eps=0.01) : X(Xin), y(yin){
+    NNMSComplex(FortranLinalg::DenseMatrix<TPrecision> &Xin, FortranLinalg::DenseVector<TPrecision> &yin, int
+        knn, bool smooth = false, double eps=0.01, double sigma2=0) : X(Xin), y(yin){
       if(knn > (int) X.N()){
         knn = X.N();
       }
-      KNN = DenseMatrix<int>(knn, X.N());
-      KNND = DenseMatrix<TPrecision>(knn, X.N());
+      KNN = FortranLinalg::DenseMatrix<int>(knn, X.N());
+      KNND = FortranLinalg::DenseMatrix<TPrecision>(knn, X.N());
 
       //Compute nearest nieghbors
-      Geometry<TPrecision>::computeANN(X, KNN, KNND, eps);
-      runMS(smooth);      
+      //Geometry<TPrecision>::computeANN(X, KNN, KNND, eps);
+      SquaredEuclideanMetric<TPrecision> dist;
+      Geometry<TPrecision>::computeKNN(X, KNN, KNND, dist);
+      
+      runMS(smooth, sigma2);      
       KNN.deallocate();
       KNND.deallocate();
     };
@@ -187,8 +191,8 @@ class NNMSComplex{
 
     //Get partioning accordinng to the crystals of the MS-complex for the
     //currently set persistence level
-    DenseVector<int> getPartitions(){
-      DenseVector<int> crys(X.N());
+    FortranLinalg::DenseVector<int> getPartitions(){
+      FortranLinalg::DenseVector<int> crys(X.N());
       getPartitions(crys);
       return crys;
     };
@@ -196,7 +200,7 @@ class NNMSComplex{
 
 
 
-    void getPartitions(DenseVector<int> &crys){
+    void getPartitions(FortranLinalg::DenseVector<int> &crys){
       for(unsigned int i=0; i<X.N(); i++){
         std::pair<int, int> p( merge(extrema(0, i)), merge(extrema(1, i)) );
         crys(i) = pcrystals[p];
@@ -214,14 +218,14 @@ class NNMSComplex{
     }; 
 
     //return extrema indicies (first row is max, secon is min) for each crystal
-    DenseMatrix<int> getCrystals(){
-       DenseMatrix<int> e(2, pcrystals.size());
+    FortranLinalg::DenseMatrix<int> getCrystals(){
+       FortranLinalg::DenseMatrix<int> e(2, pcrystals.size());
        getCrystals(e);
        return e;
     };
 
 
-    void getCrystals(DenseMatrix<int> ce){
+    void getCrystals(FortranLinalg::DenseMatrix<int> ce){
      for(map_pi_i_it it = pcrystals.begin(); it != pcrystals.end(); ++it){
         std::pair<int, int> p = (*it).first;
         ce(0, (*it).second) = extremaIndex(p.first);
@@ -231,7 +235,7 @@ class NNMSComplex{
 
 
 
-    void getMax(DenseVector<int> vmaxs){
+    void getMax(FortranLinalg::DenseVector<int> vmaxs){
      for(map_pi_i_it it = pcrystals.begin(); it != pcrystals.end(); ++it){
         std::pair<int, int> p = (*it).first;
         vmaxs((*it).second) = extremaIndex(p.first);
@@ -240,7 +244,7 @@ class NNMSComplex{
 
 
 
-    void getMin(DenseVector<int> vmins){
+    void getMin(FortranLinalg::DenseVector<int> vmins){
      for(map_pi_i_it it = pcrystals.begin(); it != pcrystals.end(); ++it){
         std::pair<int, int> p = (*it).first;
         vmins((*it).second) = extremaIndex(p.second);
@@ -249,14 +253,14 @@ class NNMSComplex{
 
 
     //get persistencies
-    DenseVector<TPrecision> getPersistence(){
-      DenseVector<TPrecision> pers(persistence.size()+1);
+    FortranLinalg::DenseVector<TPrecision> getPersistence(){
+      FortranLinalg::DenseVector<TPrecision> pers(persistence.size()+1);
       getPersistence(pers);
       return pers;
     };
 
 
-    void getPersistence(DenseVector<TPrecision> pers){
+    void getPersistence(FortranLinalg::DenseVector<TPrecision> pers){
       int index = 0;
       for(map_f_pi_it it = persistence.begin(); it != persistence.end(); ++it, ++index){
         pers(index) = (*it).first;
@@ -282,31 +286,36 @@ private:
 
 
 
-    void runMS(bool smooth){
+    void runMS(bool smooth, double sigma2){
 
 
       int knn = KNN.M();
 
-      DenseVector<TPrecision> ys;
+      FortranLinalg::DenseVector<TPrecision> ys;
       if(smooth){
-        ys = DenseVector<TPrecision>(y.N());
+        ys = FortranLinalg::DenseVector<TPrecision>(y.N());
         for(unsigned int i=0; i< ys.N(); i++){
           ys(i) = 0;
+          double wsum = 0;
           for(int k=0; k<knn; k++){
-            ys(i) += y(KNN(k, i));
+            double w = exp( -KNND(k, i) / sigma2 );
+            ys(i) += w*y(KNN(k, i));
+            wsum += w;
           }
-          ys(i) /= knn;//*(knn+1)/2;
+          ys(i) /= wsum;//*(knn+1)/2;
         }
+        //y.deallocate();
+        y = ys;
       }
       else{
         ys = y;
       }
 
 
-      KNNG = DenseMatrix<int>(2, X.N());
-      Linalg<int>::Set(KNNG, -1);
-      DenseMatrix<TPrecision> G = DenseMatrix<TPrecision>(2, X.N());
-      Linalg<TPrecision>::Zero(G);
+      KNNG = FortranLinalg::DenseMatrix<int>(2, X.N());
+      FortranLinalg::Linalg<int>::Set(KNNG, -1);
+      FortranLinalg::DenseMatrix<TPrecision> G = FortranLinalg::DenseMatrix<TPrecision>(2, X.N());
+      FortranLinalg::Linalg<TPrecision>::Zero(G);
 
 
       //compute steepest asc/descending neighbors
@@ -346,16 +355,16 @@ private:
           }
         }
       }
-      if(smooth){
-       ys.deallocate();
-      }
+      //if(smooth){
+      // ys.deallocate();
+      //}
 
 
 
       //compute for each point its minimum and maximum based on
       //steepest ascent/descent
-      extrema = DenseMatrix<int>(2, X.N()); 
-      Linalg<int>::Set(extrema, -1);
+      extrema = FortranLinalg::DenseMatrix<int>(2, X.N()); 
+      FortranLinalg::Linalg<int>::Set(extrema, -1);
 
       std::list<int> extremaL;
       std::list<int> path;
@@ -446,8 +455,8 @@ private:
       //-persistence levels: difference between saddle point and extrema of
       //neighboring crystals 
       //-merge indices: merging to extrema
-      extremaIndex = DenseVector<int>(nExt);
-      merge = DenseVector<int>(nExt);
+      extremaIndex = FortranLinalg::DenseVector<int>(nExt);
+      merge = FortranLinalg::DenseVector<int>(nExt);
       int index = 0;
       for(std::list<int>::iterator it = extremaL.begin(); it != extremaL.end(); ++it, ++index){
         extremaIndex(index) = *it;
